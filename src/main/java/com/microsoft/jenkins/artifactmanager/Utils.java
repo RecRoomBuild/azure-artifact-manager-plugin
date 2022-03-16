@@ -126,7 +126,7 @@ public final class Utils {
     }
 
     public static OffsetDateTime generateExpiryDate() {
-        return OffsetDateTime.now().plusHours(1);
+        return OffsetDateTime.now().plusYears(1);
     }
 
     public static BlobContainerClient getBlobContainerReference(StorageAccountInfo storageAccount,
