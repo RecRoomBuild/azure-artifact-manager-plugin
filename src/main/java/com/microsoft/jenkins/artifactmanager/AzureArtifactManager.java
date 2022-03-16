@@ -383,6 +383,22 @@ public final class AzureArtifactManager extends ArtifactManager implements Stash
 
     @Override
     public VirtualFile root() {
+        // Workaround for bug when viewing artifacts from Freestyle jobs
+        // that for some reason have not expanded and set the actualContainerName variable
+        // during the archival step
+        if (StringUtils.isEmpty(this.actualContainerName)) {
+            try {
+                // Request the container, which should set actualContainerName
+                getContainer();
+            } catch (IOException | URISyntaxException | InterruptedException e) {
+                // Log any exceptions for debugging, but allow execution to continue using the
+                // uninitialized container name
+                // We expect this to fail further down the stack, but there doesn't seem to be a safe default
+                // we can return instead and root() isn't allowed to throw exceptions
+                LOGGER.severe(Messages.AzureArtifactConfig_get_container_fail(e));
+            }
+        }
+
         return new AzureBlobVirtualFile(this.actualContainerName, getVirtualPath("artifacts"), build);
     }
 
